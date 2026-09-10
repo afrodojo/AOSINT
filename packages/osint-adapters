@@ -1,9 +1,0 @@
-// packages/osint-adapters/src/baseAdapter.ts
-import { IntelligenceFinding } from '@aosint/core';
-
-export abstract class BaseOSINTAdapter {
-  abstract name: string;
-  abstract supports: ('DOMAIN' | 'IP' | 'USER' | 'EMAIL')[];
-
-  abstract run(target: string): Promise<IntelligenceFinding[]>;
-}
