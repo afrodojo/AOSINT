@@ -1,0 +1,35 @@
+name: Sync Web App for Base44
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  sync-base44:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # 1. Install & Build workspace packages
+      - run: npm ci
+      - run: npm run build
+
+      # 2. Push built apps/web frontend to the base44 branch
+      - name: Deploy to Base44 Branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -B base44-release
+          
+          # Move apps/web contents to root for Base44 preview runner
+          cp -r apps/web/* .
+          
+          git add .
+          git commit -m "chore(release): sync apps/web for Base44 builder" || exit 0
+          git push origin base44-release --force
