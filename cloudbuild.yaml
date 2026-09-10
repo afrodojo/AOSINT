@@ -1,0 +1,12 @@
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-t'
+      - 'us-east4-docker.pkg.dev/eds2026-501814/aosint-repo/api:latest'
+      - '-f'
+      - 'apps/api/Dockerfile'
+      - '.'
+
+images:
+  - 'us-east4-docker.pkg.dev/eds2026-501814/aosint-repo/api:latest'
