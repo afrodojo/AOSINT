@@ -1,0 +1,98 @@
+version: '3.8'
+
+services:
+  # ---------------------------------------------------------------------------
+  # Database Layer: PostgreSQL
+  # ---------------------------------------------------------------------------
+  postgres:
+    image: postgres:16-alpine
+    container_name: aosint-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-aosint_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-aosint_secret}
+      POSTGRES_DB: ${POSTGRES_DB:-aosint_db}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-aosint_user}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ---------------------------------------------------------------------------
+  # Task Queue Broker & Caching: Redis
+  # ---------------------------------------------------------------------------
+  redis:
+    image: redis:7-alpine
+    container_name: aosint-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ---------------------------------------------------------------------------
+  # API Gateway: Fastify (apps/api)
+  # ---------------------------------------------------------------------------
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    container_name: aosint-api
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      HOST: 0.0.0.0
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      DATABASE_URL: postgres://${POSTGRES_USER:-aosint_user}:${POSTGRES_PASSWORD:-aosint_secret}@postgres:5432/${POSTGRES_DB:-aosint_db}
+      CORS_ORIGIN: "*"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    depends_on:
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+
+  # ---------------------------------------------------------------------------
+  # OSINT Task Worker: BullMQ Collector (workers/collector)
+  # ---------------------------------------------------------------------------
+  collector-worker:
+    build:
+      context: .
+      dockerfile: workers/collector/Dockerfile
+    container_name: aosint-worker
+    restart: unless-stopped
+    environment:
+      NODE_ENV: development
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      DATABASE_URL: postgres://${POSTGRES_USER:-aosint_user}:${POSTGRES_PASSWORD:-aosint_secret}@postgres:5432/${POSTGRES_DB:-aosint_db}
+      SHODAN_API_KEY: ${SHODAN_API_KEY}
+      HIBP_API_KEY: ${HIBP_API_KEY}
+      WORKER_CONCURRENCY: 5
+    volumes:
+      - .:/app
+      - /app/node_modules
+    depends_on:
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
+  redis_data:
