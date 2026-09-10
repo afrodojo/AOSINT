@@ -1,0 +1,16 @@
+{
+  "name": "aosint",
+  "private": true,
+  "version": "0.1.0",
+  "description": "AOSINT monorepo — Asaad & Shauntze's OSINT",
+  "workspaces": [
+    "apps/web",
+    "apps/api",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "echo \"Run app-specific dev scripts in each workspace\"",
+    "build": "echo \"Run app-specific build scripts in each workspace\"",
+    "lint": "echo \"Run app-specific lint scripts in each workspace\""
+  }
+}
