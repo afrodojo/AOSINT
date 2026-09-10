@@ -1,0 +1,21 @@
+// packages/core/src/types/osint.ts
+
+export type AssessmentType = 'DOMAIN' | 'IP' | 'USER' | 'EMAIL';
+
+export interface AssessmentJob {
+  jobId: string;
+  target: string;
+  type: AssessmentType;
+  status: 'PENDING' | 'PROCESSING' | 'COMPLETED' | 'FAILED';
+  createdAt: string;
+}
+
+export interface IntelligenceFinding {
+  id: string;
+  jobId: string;
+  source: 'shodan' | 'hibp' | 'sherlock' | 'amass' | 'custom_adapter';
+  entityType: 'IP' | 'SUBDOMAIN' | 'BREACH' | 'PROFILE' | 'PORT';
+  data: Record<string, unknown>;
+  confidence: number; // 0 to 100
+  timestamp: string;
+}
