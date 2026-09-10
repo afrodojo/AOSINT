@@ -1,0 +1,5 @@
+{
+  "site": {
+    "outputDirectory": "apps/web/dist"
+  }
+}
