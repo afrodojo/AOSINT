@@ -1,16 +1,17 @@
 {
-  "name": "aosint",
+  "name": "aosint-monorepo",
   "private": true,
-  "version": "0.1.0",
-  "description": "AOSINT monorepo — Asaad & Shauntze's OSINT",
   "workspaces": [
-    "apps/web",
-    "apps/api",
-    "packages/*"
+    "apps/*",
+    "packages/*",
+    "workers/*"
   ],
   "scripts": {
-    "dev": "echo \"Run app-specific dev scripts in each workspace\"",
-    "build": "echo \"Run app-specific build scripts in each workspace\"",
-    "lint": "echo \"Run app-specific lint scripts in each workspace\""
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint"
+  },
+  "devDependencies": {
+    "turbo": "^2.0.0"
   }
 }
