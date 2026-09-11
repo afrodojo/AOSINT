@@ -1,9 +1,8 @@
-# apps/api/Dockerfile
 FROM node:20-alpine AS base
 
 WORKDIR /app
 
-# Copy root monorepo package manifests
+# Copy root monorepo configuration (removed turbo.json)
 COPY package*.json ./
 COPY packages/ packages/
 COPY apps/api/ apps/api/
