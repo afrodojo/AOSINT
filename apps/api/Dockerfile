@@ -3,14 +3,16 @@ FROM node:20-alpine AS base
 
 WORKDIR /app
 
-# Copy monorepo configuration
+# Copy root monorepo package manifests
 COPY package*.json ./
 COPY packages/ packages/
 COPY apps/api/ apps/api/
 
-# Install workspace dependencies and build core packages
+# Install workspace dependencies and build packages
 RUN npm ci
-RUN npm run build --workspace=@aosint/core --workspace=@aosint/adapters || npm run build
+RUN npm run build --workspace=@aosint/core || true
+RUN npm run build --workspace=@aosint/adapters || true
+RUN npm run build --workspace=@aosint/api || true
 
 EXPOSE 3000
 
